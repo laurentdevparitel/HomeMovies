@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+    <head>
+        <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; media-src *; img-src * data: content:;">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <!--        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">-->
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css" />
+
+        <!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
+
+        <!-- font-awesome CSS v4.7.0 https://fontawesome.bootstrapcheatsheets.com/ -->
+        <link rel="stylesheet" href="libs/font-awesome.min.css" />
+        <!--        <link rel="stylesheet" href="CS/libs/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css" />-->
+
+        <!-- Theme CSS -->
+        <link rel="stylesheet" href="css/api-client.css" />        
+        <!--        <link rel="stylesheet" type="text/css" href="css/index.css">-->
+
+        <title>Home Movies App</title>
+        <style type="text/css">
+            html,
+            body {
+                height: 100%;
+                background-color: #fff
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @-webkit-keyframes spinner {
+                0% {
+                    -webkit-transform: rotate(0deg);
+                }
+
+                100% {
+                    -webkit-transform: rotate(360deg);
+                }
+            }
+
+            #spinnerContainer {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                display: -webkit-box;
+                -webkit-box-align: center;
+                -webkit-box-pack: center;
+            }
+
+            #spinnerContainer .spinner {
+                width: 64px;
+                height: 64px;
+                /* base64 image blob */
+                background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxOC4xLjEsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHZpZXdCb3g9IjAgMCAxNTUgMTU1IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxNTUgMTU1IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnIGlkPSJMYXllcl8xIj4NCgk8Y2lyY2xlIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzk2OTY5NiIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbWl0ZXJsaW1pdD0iMTAiIGN4PSI3Ny41IiBjeT0iNzcuNSIgcj0iNzQuNSIvPg0KPC9nPg0KPGcgaWQ9IkxheWVyXzIiPg0KCTxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfMV8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iMCIgeTE9IjQwLjI1IiB4Mj0iODAuNSIgeTI9IjQwLjI1Ij4NCgkJPHN0b3AgIG9mZnNldD0iNC4wMDAwMDBlLTAyIiBzdHlsZT0ic3RvcC1jb2xvcjojOTY5Njk2Ii8+DQoJCTxzdG9wICBvZmZzZXQ9IjUuNzQwMzc3ZS0wMiIgc3R5bGU9InN0b3AtY29sb3I6IzhFOEU4RSIvPg0KCQk8c3RvcCAgb2Zmc2V0PSIwLjE0NjUiIHN0eWxlPSJzdG9wLWNvbG9yOiM2ODY4NjgiLz4NCgkJPHN0b3AgIG9mZnNldD0iMC4yNDI4IiBzdHlsZT0ic3RvcC1jb2xvcjojNDg0ODQ4Ii8+DQoJCTxzdG9wICBvZmZzZXQ9IjAuMzQ2MSIgc3R5bGU9InN0b3AtY29sb3I6IzJFMkUyRSIvPg0KCQk8c3RvcCAgb2Zmc2V0PSIwLjQ1OTIiIHN0eWxlPSJzdG9wLWNvbG9yOiMxOTE5MTkiLz4NCgkJPHN0b3AgIG9mZnNldD0iMC41ODcxIiBzdHlsZT0ic3RvcC1jb2xvcjojMEIwQjBCIi8+DQoJCTxzdG9wICBvZmZzZXQ9IjAuNzQyMiIgc3R5bGU9InN0b3AtY29sb3I6IzAzMDMwMyIvPg0KCQk8c3RvcCAgb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMDAwMDAwIi8+DQoJPC9saW5lYXJHcmFkaWVudD4NCgkNCgkJPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI1NWR0lEXzFfKSIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgZD0iDQoJCU0zLDc3LjVDMywzNi40LDM2LjQsMyw3Ny41LDMiLz4NCjwvZz4NCjwvc3ZnPg==');
+                background-repeat: no-repeat;
+                background-position: top left;
+
+                -webkit-animation: spinner 1s infinite linear;
+                animation: spin 1s infinite linear;
+            }
+
+            #spinnerContainer .spinnerText {
+                text-align: left;
+                font-size: 12px;
+                margin-left: 10px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <noscript>
+        You need to enable JavaScript to run this app.
+        </noscript>
+
+        <div id="spinnerContainer">
+            <div class="spinner"></div>
+            <div class="spinnerText" id="spinnerText"></div>
+        </div>
+
+        <div id="app" style="display:none;">
+            <header id="top">
+                <div class="collapse bg-dark" id="navbarHeader">
+                    <div class="container">
+                        <div class="row">
+<!--                            <p>test</p>-->
+                        </div>
+                    </div>
+                </div>
+                <div class="navbar navbar-dark bg-dark box-shadow">
+                    <div class="container d-flex justify-content-between">
+                        <a href="#" class="navbar-brand d-flex align-items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            <strong>API Client</strong>
+                        </a>
+                        <button class="btn btn-secondary" type="button" id="refreshMovies">
+                            <i class='fa fa fa-repeat'></i>
+                        </button>
+<!--                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>-->
+                </div>
+            </header>
+
+            <main role="main">
+                <section class="jumbotron text-center">
+                    <div class="container">
+
+                        <form id="movieSearchForm">
+                            <div class="form-row align-items-center">
+                                <div class="col-9">
+                                    <label class="sr-only" for="movieKeywords">movieKeywords</label>
+                                    <input type="text" class="form-control" id="movieKeywords" value="Le grand bleu" placeholder="Le grand bleu">
+                                </div>
+
+                                <div class="col-3">
+                                    <button type="submit" class="btn btn-primary width-100" id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Recherche en cours ...">Rechercher</button>
+                                </div>
+
+                            </div>
+                            <div class="form-row align-items-center">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Filtrer
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="dropdown-menu-filter">
+                                        <a class="dropdown-item" href="#" data-filter="movie">par film</a>
+                                        <a class="dropdown-item" href="#" data-filter="serie">par série</a>
+                                        <a class="dropdown-item" href="#" data-filter="doc">par documentaire</a>
+                                        <a class="dropdown-item" href="#" data-filter="all-api">par API</a>
+                                        <a class="dropdown-item" href="#" data-filter="all">tout afficher</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row align-items-center text-center">
+                                <p><b id="totalMovieResults">0</b> movies found</p>
+                            </div>
+                        </form>
+
+                    </div>
+                </section>
+
+                <div class="album py-5 bg-light">
+                    <div class="container" >
+                        <div class="row" id="movieResults"></div>
+                        <div class="row" id="movies">
+
+
+                        </div>
+                    </div><!-- END : container -->
+                </div><!-- END : album -->
+            </main>
+
+            <footer class="text-muted">
+                <div class="container">
+                    <p class="float-right">
+                        <a href="#top">Back to top</a>
+                    </p>
+                    <p>API Client &copy; Dev Leo</p>
+                </div>
+            </footer>
+
+            <!-- Modal -->
+            <div class="modal fade" id="clientModal" tabindex="-1" role="dialog" aria-labelledby="clientModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="clientModalLabel">Modal title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <!--                    <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary">Save changes</button>
+                                            </div>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Bootstrap core JavaScript
+    ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+
+        <script src="libs/jquery-3.3.1.min.js"></script>
+        <script src="libs/popper.min.js"></script>
+        <script src="libs/bootstrap/dist/js/bootstrap.min.js" ></script>
+
+        <script src="js/api-client.js" ></script>
+
+        <!--    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>-->
+
+        <script type="text/javascript" src="cordova.js"></script>
+        <!--        <script type="text/javascript" src="js/index.js"></script>-->
+    </body>
+</html>
