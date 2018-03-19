@@ -40,8 +40,16 @@ ps -fC node
 
 https://zestedesavoir.com/tutoriels/312/debuter-avec-mongodb-pour-node-js/
 
+-- Windows :
+
 1/ start MongoDB.bat
 2/ mongo.exe
+
+-- Mac :
+
+1/ terminal : mongod
+2/ mongo --host 127.0.0.1:27017
+
 
 show dbs
 use {dbName}
