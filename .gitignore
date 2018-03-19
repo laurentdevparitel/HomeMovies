@@ -1,3 +1,6 @@
+# Ignore Mac DS_Store files
+# https://stackoverflow.com/questions/18393498/gitignore-all-the-ds-store-files-in-every-folder-and-subfolder
+.DS_Store
 /HomeMovies.bat
 /nbproject/
 /home-movies-app/node_modules/
