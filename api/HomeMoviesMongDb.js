@@ -12,7 +12,7 @@ const HomeMoviesMongDb = function () {
     this.DB_URL = 'mongodb://localhost:27017';
 
     // Database Name
-    this.DB_NAME = "myproject";
+    this.DB_NAME = "myHomeMovies";
 
     // Get the documents collection
     this.getCollection = function (db) {
