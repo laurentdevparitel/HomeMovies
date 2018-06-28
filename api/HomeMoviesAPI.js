@@ -8,12 +8,12 @@ allocine.presets['reviewlist'] = {profile: 'large'};  // add reviewlist
 
 const APIUtils = require("./APIUtils.js");
 
-// TODO : 
-// 
+// TODO :
+//
 // - http://simov.github.io/express-admin/
 // - https://github.com/simov/express-admin
-// 
-// - ajouter moteur tpl 
+//
+// - ajouter moteur tpl
 // https://webapplog.com/handlebars/
 // https://openclassrooms.com/courses/des-applications-ultra-rapides-avec-node-js/le-framework-express-js
 
@@ -38,7 +38,7 @@ const HomeMoviesAPI = function () {
     };
 
     /**
-     * 
+     *
      * @returns {String}
      */
     this.getPublicRoutesMenu = function () {
@@ -174,7 +174,7 @@ const HomeMoviesAPI = function () {
     };
 
     this.isMovieDoc = function (movieName) {
-        //console.info('HomeMoviesAPI: isMovieDoc', movieName);        
+        //console.info('HomeMoviesAPI: isMovieDoc', movieName);
         return /DOC/g.test(movieName);
     };
 
@@ -192,7 +192,7 @@ const HomeMoviesAPI = function () {
     };
 
     this.getMovieGenres = function (movie) {
-        //console.info('HomeMoviesAPI: getMovieGenres', movie);  
+        //console.info('HomeMoviesAPI: getMovieGenres', movie);
         let genres = [];
         if (movie.API && movie.API.AlloCine && movie.API.AlloCine.genre) {
             movie.API.AlloCine.genre.forEach(function (genre) {
@@ -325,7 +325,7 @@ const HomeMoviesAPI = function () {
     /**
      * Scanne la liste des fichiers films
      * @param {fn} callbackFn
-     * @returns {obj} 
+     * @returns {obj}
      * https://www.npmjs.com/package/scandir
      * https://www.npmjs.com/package/node-id3 > KO
      * https://github.com/43081j/id3
@@ -391,7 +391,7 @@ const HomeMoviesAPI = function () {
             }
             str += "module.exports = scannedMovies;\n";
 
-//        str += "let scannedMovies = "+JSON.stringify(scannedMovies)+"\n";        
+//        str += "let scannedMovies = "+JSON.stringify(scannedMovies)+"\n";
 //        str += "module.exports = JSON.parse(scannedMovies);\n";
 
             fs.writeFile(self.getCONFIG().EXPORTS_SCANNED_MOVIES_FILE, str, (err) => {
@@ -448,9 +448,9 @@ const HomeMoviesAPI = function () {
         console.info(this.constructor.name + ' [downloadFile]', uri);
 
         let self = this;
-        
+
         const dirSep = self.getCONFIG().LINUX_ENV ? "/" : "\\";
-        
+
         let file = uri.split("/").pop();
         let dest = __dirname + dirSep + self.getCONFIG().PICTURES_DIR + dirSep + file;
         //console.log(self.constructor.name + ' [downloadFile]', file, dest);
@@ -487,12 +487,12 @@ const HomeMoviesAPI = function () {
     /**
      * Redimensionne un fichier image
      * http://sharp.dimens.io/en/stable/api-resize/
-     * 
+     *
      * 1/ installer oitils c++ (cmd admin) : npm install --global --production windows-build-tools
      * 2/ npm install sharp --save
-     * 
+     *
      * https://www.npmjs.com/package/jimp
-     * 
+     *
      * @param {string} inputPictureFile
      * @param {string} outputPictureFile
      * @param {boolean} useSharpLib
@@ -509,7 +509,7 @@ const HomeMoviesAPI = function () {
             const sharp = require('sharp');
 
             sharp(inputPictureFile)
-                    .resize(self.getCONFIG().MAX_RESIZED_PICTURES_WIDTH, null)   // width, height               
+                    .resize(self.getCONFIG().MAX_RESIZED_PICTURES_WIDTH, null)   // width, height
                     .toFile(outputPictureFile)
                     .then(function (result) {
                         //console.log(self.constructor.name + ' [resizePictureFile]', result);
@@ -524,9 +524,9 @@ const HomeMoviesAPI = function () {
             const Jimp = require("jimp");
 
             Jimp.read(inputPictureFile).then(function (pict) {
-                pict.resize(self.getCONFIG().MAX_RESIZED_PICTURES_WIDTH, Jimp.AUTO)            // resize (width, height) Jimp.AUTO                
-                        .quality(80)                 // set JPEG quality 
-                        //.greyscale()                 // set greyscale 
+                pict.resize(self.getCONFIG().MAX_RESIZED_PICTURES_WIDTH, Jimp.AUTO)            // resize (width, height) Jimp.AUTO
+                        .quality(80)                 // set JPEG quality
+                        //.greyscale()                 // set greyscale
                         .write(outputPictureFile, function () {
                             if (typeof (callbackFn) !== "undefined" && typeof (callbackFn) === "function") {
                                 callbackFn.call(self, {
@@ -537,7 +537,7 @@ const HomeMoviesAPI = function () {
                                     name: outputPictureFile.split("\\").pop()
                                 });
                             }
-                        }); // save 
+                        }); // save
             }).catch(function (error) {
                 console.error(self.constructor.name + ' [resizePictureFile]', error);
                 if (typeof (errorCallbackFn) !== "undefined" && typeof (errorCallbackFn) === "function") {
@@ -553,7 +553,7 @@ const HomeMoviesAPI = function () {
 
     /**
      * Lance le batch de traitement des affiches de films
-     * TODO : 
+     * TODO :
      * - utiliser async
      * - utiliser méthode dans storeMovie en passant en param un array de movies
      * @returns {void}
@@ -563,7 +563,7 @@ const HomeMoviesAPI = function () {
 
         var self = this;
         const dirSep = self.getCONFIG().LINUX_ENV ? "/" : "\\";
-        
+
         var fileName, inputPictureFile, outputPictureFile;
         var logs = [];
 
@@ -850,7 +850,7 @@ const HomeMoviesAPI = function () {
                 async.map(files, readFn, callback);
             },
 
-            // Écriture de chaque fichier final 
+            // Écriture de chaque fichier final
             function (key, value, callback) {
                 writeFn(key, value, callback);
             },
@@ -898,7 +898,7 @@ const HomeMoviesAPI = function () {
      * Récupère et stocke un obj film après un appel à l'API AlloCine
      * @param {obj} movie
      * @param {fn} callbackFn
-     * @returns {obj} 
+     * @returns {obj}
      * https://scotch.io/tutorials/use-expressjs-to-get-url-and-post-parameters
      */
     this.storeMovie = function (movie, callbackFn) {
@@ -934,7 +934,7 @@ const HomeMoviesAPI = function () {
                 return;
             } else {
 
-                // on récupère sa fiche complète 
+                // on récupère sa fiche complète
                 allocine.api('movie', {code: parseInt(movie.API['AlloCine'].code)}, function (error, result) {
                     if (error) {
                         console.error('server [storeMovie] Error : ' + error);
@@ -950,7 +950,7 @@ const HomeMoviesAPI = function () {
                     console.log('server [storeMovie]', movie.API['AlloCine'].code, result);
                     movie.API['AlloCine'] = result.movie;
 
-                    // on l'ajoute à la liste                        
+                    // on l'ajoute à la liste
                     movies.push(movie);
                     console.log('server [storeMovie] movies: ', movies);
 
@@ -989,5 +989,3 @@ const HomeMoviesAPI = function () {
 };
 
 module.exports = new HomeMoviesAPI();
-
-

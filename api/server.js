@@ -12,7 +12,9 @@ var debug = require('debug')('myapp:mycontext');
 //    name = 'My App';
 
 // Afficher variables environnement
+console.log("--- process.env [START]");
 console.info(process.env);
+console.log("--- process.env [END]");
 
 const fs = require('fs');
 const path = require("path");
@@ -21,14 +23,32 @@ const path = require("path");
 let allocine = require('allocine-api');
 allocine.presets['reviewlist'] = {profile: 'large'};  // add reviewlist
 
+/**
+ * getClientUR
+ */
+function getClientURI(){
+  if (typeof (process.env.SSH_CLIENT) !== "undefined"){ // Bananapi
+    return 'http://192.168.0.50:' + port + '/';
+  }
+  else if (typeof (process.env.NODE_ENV) !== "undefined" && process.env.NODE_ENV === 'production '){  // Heroku
+    return 'https://evening-river-52675.herokuapp.com/';
+  }
+  else {  // localhost
+    return 'http://localhost:' + port + '/';
+  }
+};
+
 const CONFIG = {
     LINUX_ENV: typeof (process.env.SSH_CLIENT) !== "undefined" ? true: false,
     VIDEO_DIR: typeof (process.env.SSH_CLIENT) !== "undefined" ? '/mnt/data/media/video/' : 'I:\GRABIT/',
     VIDEO_DIR_PROTECTED: typeof (process.env.SSH_CLIENT) !== "undefined" ? '/mnt/data/media/video/' : 'I:GRABIT\\',
     VIDEO_OLD_DIR: '__OLD',
-    CLIENT_URI: typeof (process.env.SSH_CLIENT) !== "undefined" ? 'http://192.168.0.50:' + port + '/' : 'http://localhost:' + port + '/',
-    EXPORTS_SCANNED_MOVIES_FILE: './exports/scannedMovies.js',
-    EXPORTS_MOVIES_JSON_FILE: './exports/movies.json',
+    CLIENT_URI: getClientURI(),
+    //CLIENT_URI: typeof (process.env.SSH_CLIENT) !== "undefined" ? 'http://192.168.0.50:' + port + '/' : 'http://localhost:' + port + '/',
+    EXPORTS_SCANNED_MOVIES_FILE: __dirname + '/exports/scannedMovies.js',
+    //EXPORTS_SCANNED_MOVIES_FILE: './exports/scannedMovies.js',
+    EXPORTS_MOVIES_JSON_FILE: __dirname + '/exports/movies.json',
+    //EXPORTS_MOVIES_JSON_FILE: './exports/movies.json',
     PICTURES_DIR: 'pictures',
     RESIZED_PICTURES_DIR: 'pictures/resized',
     MAX_RESIZED_PICTURES_WIDTH: 300
