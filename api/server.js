@@ -12,7 +12,7 @@ var debug = require('debug')('myapp:mycontext');
 //    name = 'My App';
 
 // Afficher variables environnement
-//console.info(process.env);
+console.info(process.env);
 
 const fs = require('fs');
 const path = require("path");
@@ -66,7 +66,7 @@ try {
     app.use('/css', express.static(__dirname + '/../home-movies-app/www/css'));
     app.use('/fonts', express.static(__dirname + '/../home-movies-app/www/fonts'));
     app.use('/img', express.static(__dirname + '/../home-movies-app/www/img'));
-    
+
     // Rep images téléchargées et redimensionnées
     app.use('/pictures', express.static(__dirname + '/pictures'));
 
@@ -92,7 +92,7 @@ try {
 
     /**
      * AlloCine API : Recherche par mots-clés
-     * 
+     *
      * TODO : sécuriser données entrantes
      * https://scotch.io/tutorials/use-expressjs-to-get-url-and-post-parameters
      */
@@ -214,7 +214,7 @@ try {
 
     /**
      * Renvoie la liste des fichiers films scannés ET déjà trouvés par l'API
-     * 
+     *
      */
     app.get('/getAllMovies', function (req, res) {
 
@@ -224,10 +224,10 @@ try {
 
         //res.end('>>> END getAllMovies');
     });
-    
+
     /**
      * Renvoie la liste des genres rencontrés
-     * 
+     *
      */
     app.get('/getMoviesGenres', function (req, res) {
 
@@ -235,14 +235,14 @@ try {
             APIUtils.sendJSONResponse(res, movies);
         });
     });
-    
+
     app.get('/batchMoviePictures', function (req, res) {
 
         HomeMoviesAPI.batchMoviePictures(function (result) {
             APIUtils.sendJSONResponse(res, result);
         });
     });
-    
+
     app.get('/asyncBatchMoviePictures', function (req, res) {
 
         HomeMoviesAPI.asyncTest2(function (result) {
@@ -251,26 +251,26 @@ try {
 //        HomeMoviesAPI.asyncBatchMoviePictures(function (result) {
 //            APIUtils.sendJSONResponse(res, result);
 //        });
-        
-        
+
+
     });
-    
-    
-    
+
+
+
     /**
      * Tests
      */
     app.get('/testMovies', function (req, res) {
-        
+
 //        let uri = "http://images.allocine.fr/pictures/16/02/15/08/47/568021.jpg";
-//        
+//
 //        HomeMoviesAPI.downloadFile(uri, function (response) {   // OK
 //            APIUtils.sendJSONResponse(res, response);
 //        });
-        
+
 //        const inputPictureFile = CONFIG.LINUX_ENV ? __dirname + "/" + HomeMoviesAPI.getCONFIG().PICTURES_DIR + "/568021.jpg" : __dirname + "\\" + HomeMoviesAPI.getCONFIG().PICTURES_DIR + "\\568021.jpg";
 //        const outputPictureFile = CONFIG.LINUX_ENV ? __dirname + "/" + HomeMoviesAPI.getCONFIG().RESIZED_PICTURES_DIR + "/568021.jpg" : __dirname + "\\" + HomeMoviesAPI.getCONFIG().RESIZED_PICTURES_DIR + "\\568021.jpg";
-//        
+//
 //        HomeMoviesAPI.resizePictureFile(inputPictureFile, outputPictureFile, false, function (response) {   // OK
 //            APIUtils.sendJSONResponse(res, response);
 //        });
@@ -431,4 +431,3 @@ try {
 } catch (error) {
     console.error(error);
 }
-
