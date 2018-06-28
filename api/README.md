@@ -1,3 +1,10 @@
+## Launch NodeJS services
+
+```
+npm run-script start
+npm run-script inspect
+```
+
 ## How to make a node.js application run permanently ?
 
 http://www.web-technology-experts-notes.in/2017/01/how-to-make-nodejs-application-run-permanently.html
@@ -26,7 +33,7 @@ top
 
 kill {PROCESS_ID}
 
-OR 
+OR
 
 killall node
 

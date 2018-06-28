@@ -1,7 +1,7 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "description": "",
+  "description": "HomeMovies Application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
