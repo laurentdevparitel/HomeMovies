@@ -15,7 +15,6 @@ var debug = require('debug')('myapp:mycontext');
 console.log("--- process.env [START]");
 console.info(process.env);
 console.log("--- process.env [END]");
-console.log(process.env.NODE_ENV );
 
 const fs = require('fs');
 const path = require("path");
@@ -25,13 +24,13 @@ let allocine = require('allocine-api');
 allocine.presets['reviewlist'] = {profile: 'large'};  // add reviewlist
 
 /**
- * getClientUR
+ * getClientURI
  */
 function getClientURI(){
   if (typeof (process.env.SSH_CLIENT) !== "undefined"){ // Bananapi
     return 'http://192.168.0.50:' + port + '/';
   }
-  else if (typeof (process.env.NODE_ENV) !== "undefined" && process.env.NODE_ENV === 'production '){  // Heroku
+  else if (typeof (process.env.NODE_ENV) !== "undefined" && process.env.NODE_ENV === 'production'){  // Heroku
     return 'https://evening-river-52675.herokuapp.com/';
   }
   else {  // localhost
