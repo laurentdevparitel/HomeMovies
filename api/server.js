@@ -15,6 +15,7 @@ var debug = require('debug')('myapp:mycontext');
 console.log("--- process.env [START]");
 console.info(process.env);
 console.log("--- process.env [END]");
+console.log(process.env.NODE_ENV );
 
 const fs = require('fs');
 const path = require("path");

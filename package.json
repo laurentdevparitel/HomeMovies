@@ -8,7 +8,7 @@
   "main": "api/server.js",
   "scripts": {
     "start": "node api/server.js",
-    "inspect": "node --inspect api/erver.js",
+    "inspect": "node --inspect api/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
