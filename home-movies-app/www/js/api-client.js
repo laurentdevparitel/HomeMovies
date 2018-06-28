@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * TODO : 
- * 
+ * TODO :
+ *
  * - btn refresh > OK
  * - afficher critiques presse > OK
  * (composant accordeon : https://getbootstrap.com/docs/4.0/components/collapse/#accordion-example)
@@ -13,19 +13,20 @@
  * - faire tourner NodeJS sans passer par Putty > OK
  * http://www.web-technology-experts-notes.in/2017/01/how-to-make-nodejs-application-run-permanently.html
  * http://weworkweplay.com/play/raspberry-pi-nodejs/
- * 
+ *
  * - Installer MongoDb
  * https://zestedesavoir.com/tutoriels/312/debuter-avec-mongodb-pour-node-js/ :
- * 
+ *
  * - Bonnes pratiques :
  * http://naholyr.fr/2011/06/bonnes-pratiques-asynchrone-javascript-nodejs/
- * 
+ *
  */
 
 function APIClient() {
     console.info('### APIClient');
 
-    this.SERVER_URL = document.location.hostname === "localhost" ? "http://localhost:8080/" : "http://192.168.0.50:8080/";
+    this.SERVER_URL = this.getServerURL();
+    //this.SERVER_URL = document.location.hostname === "localhost" ? "http://localhost:8080/" : "http://192.168.0.50:8080/";
 
     this.movies = [];
     this.movie = {};
@@ -42,6 +43,19 @@ function APIClient() {
         serie: "par série",
         doc: "par documentaire"
     };
+};
+
+APIClient.prototype.getServerURL = function () {
+    console.info('APIClient [getServerURL]');
+    if (document.location.hostname === "localhost"){  // localhost
+      return "http://localhost:8080/";
+    }
+    else if (document.location.port === ""){  // Heraku > production
+      return document.location.origin + "/";
+    }
+    else {
+      return "http://192.168.0.50:8080/"; // Bananapi
+    }
 };
 
 APIClient.prototype.setMovies = function (movies) {
@@ -171,14 +185,14 @@ APIClient.prototype.getFilteredMoviesBy = function (filter) {
             case "all":
                 filteredMovies.push(movie);
                 break;
-                
+
             default:
                 if (/^genre:/g.test(filter)){
                     var genre = filter.split(":")[1];
                     if (typeof (movie.API) !== "undefined" && typeof (movie.API.AlloCine) !== "undefined" && typeof (movie.API.AlloCine.genre) !== "undefined") {
                         movie.API.AlloCine.genre.forEach(function(g){
                             if (g["$"].toLowerCase() === genre.toLowerCase()) filteredMovies.push(movie);
-                        }); 
+                        });
                     }
                 }
                 break;
@@ -309,7 +323,7 @@ APIClient.prototype.refreshMoviesList = function (data) {
                 // Màj le film du store en cours
                 me.setMovieKey($(this).data('movie-key'));
 
-                // Soumet la recherche 
+                // Soumet la recherche
                 var keywords = $("#movieKeywords").val();
                 me.searchMovie(keywords);
             }
@@ -534,12 +548,12 @@ APIClient.prototype.getAPIMovie = function (movie, showSaveBtn) {
     var link = typeof (movie.link[0]) !== "undefined" ? movie.link[0].href : "#";
     var actors = typeof (movie.castingShort) !== "undefined" ? movie.castingShort.actors : "";
     var directors = typeof (movie.castingShort) !== "undefined" ? movie.castingShort.directors : "";
-    
+
     if (poster.length){ // on affiche l'image traitée localement pour améliorer les perfs
         var fileName = poster.split("/").pop();
         poster = 'pictures/resized/'+fileName;
     }
-    
+
     var card = '<div class="card">\n\
                     <img class="card-img-top" src="' + poster + '" alt="' + movie.originalTitle + '" onerror="this.onerror=null; this.src=\'./img/404.png\'; this.className=\'card-img-top img-404\';">\n\
                     <div class="card-body">\n\
@@ -582,7 +596,7 @@ APIClient.prototype.getGenres = function (genres) {
 };
 
 /**
- * Ajoute une fiche issue de l'API pour un film sélectionné 
+ * Ajoute une fiche issue de l'API pour un film sélectionné
  * @param {type} movieCodeAlloCine
  * @returns {void}
  */
@@ -763,7 +777,7 @@ APIClient.prototype.getMoviesGenres = function () {
                 html: filter.label
             }).appendTo(filterDropDown);
         });
-            
+
         // add events
         $("#dropdown-menu-filter a").on("click", function (e) {
             e.preventDefault();
@@ -965,4 +979,3 @@ if (!window.cordova) { // desktop
         startApp();
     }, false);
 }
-
