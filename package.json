@@ -1,0 +1,22 @@
+{
+  "name": "homemovies",
+  "version": "1.0.0",
+  "description": "HomeMovies Application",
+  "engines": {
+    "node": "10.5.0"
+  },
+  "main": "api/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laurentdevparitel/HomeMovies.git"
+  },
+  "author": "Leo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/laurentdevparitel/HomeMovies/issues"
+  },
+  "homepage": "https://github.com/laurentdevparitel/HomeMovies#readme"
+}
