@@ -47,14 +47,20 @@ function APIClient() {
 
 APIClient.prototype.getServerURL = function () {
     console.info('APIClient [getServerURL]');
-    if (document.location.hostname === "localhost"){  // localhost
+    if (document.location.hostname === "localhost"){  // localhost > app desktop
       return "http://localhost:8080/";
     }
-    else if (document.location.port === ""){  // Heraku > production
-      return document.location.origin + "/";
+    else if (document.location.port === ""){
+      if (document.location.protocol === "file:"){  // Cordova > app mobile
+        return "https://evening-river-52675.herokuapp.com/";
+      }
+      else {  // Heraku > app production
+        return document.location.origin + "/";
+      }
     }
     else {
       return "http://192.168.0.50:8080/"; // Bananapi
+      //return "https://evening-river-52675.herokuapp.com/";  // Heraku > production
     }
 };
 
