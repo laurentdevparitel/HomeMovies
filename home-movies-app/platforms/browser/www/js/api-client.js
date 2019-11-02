@@ -21,7 +21,8 @@
 function APIClient() {
     console.info('### APIClient');
 
-    this.SERVER_URL = document.location.hostname === "localhost" ? "http://localhost:8080/" : "http://192.168.0.50:8080/";
+    this.SERVER_URL = document.location.hostname === "localhost" ? "http://localhost:54321/" : "http://192.168.0.50:54321/";
+    //this.SERVER_URL = document.location.hostname === "localhost" ? "http://localhost:8080/" : "http://192.168.0.50:8080/";
 
     this.movies = [];
     this.movie = {};

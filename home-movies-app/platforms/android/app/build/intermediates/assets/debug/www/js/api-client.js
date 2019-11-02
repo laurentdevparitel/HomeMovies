@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * TODO : 
- * 
+ * TODO :
+ *
  * - btn refresh > OK
  * - afficher critiques presse > OK
  * (composant accordeon : https://getbootstrap.com/docs/4.0/components/collapse/#accordion-example)
@@ -13,19 +13,20 @@
  * - faire tourner NodeJS sans passer par Putty > OK
  * http://www.web-technology-experts-notes.in/2017/01/how-to-make-nodejs-application-run-permanently.html
  * http://weworkweplay.com/play/raspberry-pi-nodejs/
- * 
+ *
  * - Installer MongoDb
  * https://zestedesavoir.com/tutoriels/312/debuter-avec-mongodb-pour-node-js/ :
- * 
+ *
  * - Bonnes pratiques :
  * http://naholyr.fr/2011/06/bonnes-pratiques-asynchrone-javascript-nodejs/
- * 
+ *
  */
 
 function APIClient() {
     console.info('### APIClient');
 
-    this.SERVER_URL = document.location.hostname === "localhost" ? "http://localhost:8080/" : "http://192.168.0.50:8080/";
+    this.SERVER_URL = this.getServerURL();
+    //this.SERVER_URL = document.location.hostname === "localhost" ? "http://localhost:8080/" : "http://192.168.0.50:8080/";
 
     this.movies = [];
     this.movie = {};
@@ -34,6 +35,34 @@ function APIClient() {
     this.returnedAPIMovies = {}; // films renvoyés par l'API classés par clé
 
     this.actionBtn = null;    // btn 'save' cliqué
+
+    this.basicFilters = {
+        all: "tout afficher",
+        movie: "par film",
+        "all-api": "par film possédant une fiche",
+        serie: "par série",
+        doc: "par documentaire"
+    };
+};
+
+APIClient.prototype.getServerURL = function () {
+    console.info('APIClient [getServerURL]');
+    if (document.location.hostname === "localhost"){  // localhost > app desktop
+      return "http://localhost:8080/";
+    }
+    else if (document.location.port === ""){
+      if (document.location.protocol === "file:"){  // Cordova > app mobile
+        return "https://evening-river-52675.herokuapp.com/";
+      }
+      else {  // Heraku > app production
+        return document.location.origin + "/";
+      }
+    }
+    else {
+      return "http://192.168.0.50:54321/"; // Bananapi
+      //return "http://192.168.0.50:8080/"; // Bananapi
+      //return "https://evening-river-52675.herokuapp.com/";  // Heraku > production
+    }
 };
 
 APIClient.prototype.setMovies = function (movies) {
@@ -47,16 +76,16 @@ APIClient.prototype.setMovie = function (movie) {
     this.movie = movie;
 };
 APIClient.prototype.getMovie = function (key) {
-    if (typeof(key) !== "undefined"){
+    if (typeof (key) !== "undefined") {
         var movie = null;
-        this.movies.forEach(function(m){
-            if (parseInt(m.key) === parseInt(key) ){
+        this.movies.forEach(function (m) {
+            if (parseInt(m.key) === parseInt(key)) {
                 movie = m;
             }
         });
         return movie;
     }
-    return this.movie;    
+    return this.movie;
 };
 APIClient.prototype.setMovieKey = function (key) {
     console.info('APIClient [setMovieKey]', key);
@@ -64,6 +93,10 @@ APIClient.prototype.setMovieKey = function (key) {
 };
 APIClient.prototype.getMovieKey = function () {
     return this.movieKey;
+};
+
+APIClient.prototype.getBasicFilters = function () {
+    return this.basicFilters;
 };
 
 APIClient.prototype.findMovie = function (movieCode) {
@@ -109,15 +142,8 @@ APIClient.prototype.attachEvents = function () {
         me.searchMovie(keywords);
     });
 
-    $("#dropdown-menu-filter a").on("click", function (e) {
-        e.preventDefault();
-        //console.log($(this).data('filter'));
 
-        var filteredMovies = me.getFilteredMoviesBy($(this).data('filter'));
 
-        me.refreshMoviesList(filteredMovies);
-    });
-    
     $("#refreshMovies").on("click", function (e) {
         e.preventDefault();
 
@@ -165,6 +191,17 @@ APIClient.prototype.getFilteredMoviesBy = function (filter) {
                 break;
             case "all":
                 filteredMovies.push(movie);
+                break;
+
+            default:
+                if (/^genre:/g.test(filter)){
+                    var genre = filter.split(":")[1];
+                    if (typeof (movie.API) !== "undefined" && typeof (movie.API.AlloCine) !== "undefined" && typeof (movie.API.AlloCine.genre) !== "undefined") {
+                        movie.API.AlloCine.genre.forEach(function(g){
+                            if (g["$"].toLowerCase() === genre.toLowerCase()) filteredMovies.push(movie);
+                        });
+                    }
+                }
                 break;
         }
 
@@ -293,7 +330,7 @@ APIClient.prototype.refreshMoviesList = function (data) {
                 // Màj le film du store en cours
                 me.setMovieKey($(this).data('movie-key'));
 
-                // Soumet la recherche 
+                // Soumet la recherche
                 var keywords = $("#movieKeywords").val();
                 me.searchMovie(keywords);
             }
@@ -304,17 +341,28 @@ APIClient.prototype.refreshMoviesList = function (data) {
 
 APIClient.prototype.getMovieItem = function (movie, key) {
 
+    var me = this;
     var code = (movie.API && movie.API.AlloCine && movie.API.AlloCine.code) ? movie.API.AlloCine.code.toString() : "";
     var successClassName = code.length ? "success" : "";
 
-    return '<a href="#" class="list-group-item list-group-item-action flex-column align-items-start ' + successClassName + '" data-movie-key="' + movie.key + '" data-movie-code="' + code + '">\n\
+    var html = '';
+    html += '<a href="#" class="list-group-item list-group-item-action flex-column align-items-start ' + successClassName + '" data-movie-key="' + movie.key + '" data-movie-code="' + code + '">\n\
                 <div class="d-flex w-100 justify-content-between">\n\
                     <h5 class="mb-1">' + movie.searchName + '</h5>\n\
-                    <small>' + fileConvertSize(movie.size) + '</small>\n\
+                    <small>';
+
+    if (code.length) {
+        html += getRunTime(movie.API.AlloCine.runtime);
+        html += '<br />' + me.getGenres(movie.API.AlloCine.genre) + '<br />';
+    }
+    html += fileConvertSize(movie.size);
+    html += '    </small>\n\
                 </div>\n\
                 <p class="code">' + code + '</p>\n\
                 <small>' + movie.base + '</small>\n\
             </a>';
+
+    return html;
 };
 
 /**
@@ -479,7 +527,7 @@ APIClient.prototype.attachMovieResultsEvents = function () {
 
         $(this).on("click", function (e) {
             e.preventDefault();
-            
+
             // On màj la ref du btn
             me.setActionBtn($(this));
 
@@ -507,6 +555,11 @@ APIClient.prototype.getAPIMovie = function (movie, showSaveBtn) {
     var link = typeof (movie.link[0]) !== "undefined" ? movie.link[0].href : "#";
     var actors = typeof (movie.castingShort) !== "undefined" ? movie.castingShort.actors : "";
     var directors = typeof (movie.castingShort) !== "undefined" ? movie.castingShort.directors : "";
+
+    if (poster.length){ // on affiche l'image traitée localement pour améliorer les perfs
+        var fileName = poster.split("/").pop();
+        poster = 'pictures/resized/'+fileName;
+    }
 
     var card = '<div class="card">\n\
                     <img class="card-img-top" src="' + poster + '" alt="' + movie.originalTitle + '" onerror="this.onerror=null; this.src=\'./img/404.png\'; this.className=\'card-img-top img-404\';">\n\
@@ -550,7 +603,7 @@ APIClient.prototype.getGenres = function (genres) {
 };
 
 /**
- * Ajoute une fiche issue de l'API pour un film sélectionné 
+ * Ajoute une fiche issue de l'API pour un film sélectionné
  * @param {type} movieCodeAlloCine
  * @returns {void}
  */
@@ -558,9 +611,9 @@ APIClient.prototype.storeMovie = function (movieCodeAlloCine) {
     console.info('APIClient [storeMovie]', movieCodeAlloCine);
 
     var me = this;
-    var movie = me.getMovie(me.getMovieKey()); 
-    if (!movie){
-        throw new Error('No movie found with key: '+me.getMovieKey());
+    var movie = me.getMovie(me.getMovieKey());
+    if (!movie) {
+        throw new Error('No movie found with key: ' + me.getMovieKey());
         return;
     }
 
@@ -643,11 +696,11 @@ APIClient.prototype.showPressReviews = function (movieCodeAlloCine) {
 
     request.done(function (data) {  // success
         console.log('APIClient [showPressReviews] done', data);
-        
+
         me.getActionBtn().text('Done');
-        
-        if (data.feed.review){
-            
+
+        if (data.feed.review) {
+
             // on màj le contenu de l'accordion
             var htmlReviews = me.getAPIPressReviews(data.feed.review);
 
@@ -659,8 +712,7 @@ APIClient.prototype.showPressReviews = function (movieCodeAlloCine) {
 
             // Show
             clientModal.modal('show');
-        }
-        else {
+        } else {
             me.showMessage("No press review for this movie ...", 3);
         }
     });
@@ -681,6 +733,84 @@ APIClient.prototype.showPressReviews = function (movieCodeAlloCine) {
     });
 };
 
+APIClient.prototype.getMoviesGenres = function () {
+    console.info('APIClient [getMoviesGenres]');
+
+    var me = this;
+
+    var route = me.SERVER_URL + "getMoviesGenres/";
+
+    var request = $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: route,
+        beforeSend: function () {
+            //
+        }
+    });
+
+    request.done(function (data) {  // success
+        console.log('APIClient [getMoviesGenres] done', data);
+
+        var filterDropDown = $("#dropdown-menu-filter");
+        filterDropDown.empty(); // init
+
+        var filters = [];
+
+        for (var filter in me.getBasicFilters()) {
+            filters.push({
+                key: filter,
+                label: me.getBasicFilters()[filter]
+            });
+        }
+
+        if (data.genres) {
+            for (var genre in data.genres) {
+                filters.push({
+                    key: "genre:"+genre,
+                    label: "par genre: "+ genre+" ("+data.genres[genre]+")"
+                });
+            }
+        } else {
+            me.showMessage("No genres list available ...", 3);
+        }
+
+        // affichage
+        filters.forEach(function(filter){
+            $("<a/>", {
+                "class": "dropdown-item",
+                href: "#",
+                "data-filter": filter.key,
+                html: filter.label
+            }).appendTo(filterDropDown);
+        });
+
+        // add events
+        $("#dropdown-menu-filter a").on("click", function (e) {
+            e.preventDefault();
+            //console.log($(this).data('filter'));
+
+            var filteredMovies = me.getFilteredMoviesBy($(this).data('filter'));
+
+            me.refreshMoviesList(filteredMovies);
+        });
+    });
+    request.fail(function (xhr, textStatus, errorThrown) { // error
+        console.error('APIClient [getMoviesGenres] fail', textStatus);
+        if (xhr.readyState === 4) {
+            // HTTP error (can be checked by XMLHttpRequest.status and XMLHttpRequest.statusText)
+        } else if (xhr.readyState === 0) {
+            // Network error (i.e. connection refused, access denied due to CORS, etc.)
+            me.showMessage('Network error', 2);
+        } else {
+            // something weird is happening
+        }
+    });
+    request.always(function (xhr, textStatus, errorThrown) { // complete
+        console.log('APIClient [getMoviesGenres] always', textStatus);
+    });
+};
+
 /*
  * Renvoie la liste des critiques
  * @param {obj} reviews
@@ -688,34 +818,34 @@ APIClient.prototype.showPressReviews = function (movieCodeAlloCine) {
  */
 APIClient.prototype.getAPIPressReviews = function (reviews) {
     console.info('APIClient [getAPIPressReviews]', reviews);
-    
+
     var html = '<div id="accordion">';
-    
-    reviews.forEach(function(review, index){
-        
+
+    reviews.forEach(function (review, index) {
+
         html += '<div class="card">\n\
-                        <div class="card-header" id="heading-'+index+'">\n\
+                        <div class="card-header" id="heading-' + index + '">\n\
                             <h5 class="mb-0">\n\
-                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-'+index+'" aria-expanded="true" aria-controls="collapse-'+index+'">\n\
-                                    '+review.newsSource.name+'\n\
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-' + index + '" aria-expanded="true" aria-controls="collapse-' + index + '">\n\
+                                    ' + review.newsSource.name + '\n\
                                 </button>\n\
-                                <span class="badge badge-secondary">'+review.rating+'</span>\n\
+                                <span class="badge badge-secondary">' + review.rating + '</span>\n\
                             </h5>\n\
                         </div>';
 
-        html += '    <div id="collapse-'+index+'" class="collapse" aria-labelledby="heading-'+index+'" data-parent="#accordion">\n\
+        html += '    <div id="collapse-' + index + '" class="collapse" aria-labelledby="heading-' + index + '" data-parent="#accordion">\n\
                             <div class="card-body">\n\
-                            '+review.body+'\n\
+                            ' + review.body + '\n\
                             </div>\n\
                         </div>\n\
                     </div>';
     });
-    
+
     html += '</div>';
-  
+
     return html;
 };
-    
+
 /**
  * Gère l'affichage du loader du conteneur "movies"
  * @param {boolean} visible
@@ -813,24 +943,27 @@ function getRunTime(seconds) {
 
 function removeElt(eltId) {
     var elt = document.getElementById(eltId);
-    if (elt) elt.parentNode.removeChild(elt);
+    if (elt)
+        elt.parentNode.removeChild(elt);
 }
 
 var myAPIClient;
 
 function startApp() {
-    
+
     $(function () {
 
         try {
-            
+
             removeElt('spinnerContainer');
             document.getElementById('app').style.display = 'block';
-          
+
             myAPIClient = new APIClient();
 
             myAPIClient.attachEvents();
             myAPIClient.loadMovies();
+
+            myAPIClient.getMoviesGenres();
 
         } catch (error) {
             console.error(error);
@@ -842,8 +975,7 @@ function startApp() {
 
 if (!window.cordova) { // desktop
     startApp();
-} 
-else {  // device
+} else {  // device
 
     document.addEventListener('deviceready', function () {
         console.info("deviceready detected > cordova");
@@ -854,4 +986,3 @@ else {  // device
         startApp();
     }, false);
 }
-

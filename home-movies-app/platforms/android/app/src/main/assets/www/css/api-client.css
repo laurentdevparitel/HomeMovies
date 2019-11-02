@@ -82,6 +82,7 @@ img.img-404 {max-width: 252px; margin: 20px auto;}
 #movies a.list-group-item:visited {/*background-color: #f8f9fa;*/ }
 #movies a.list-group-item:focused {background-color: #f8f9fa; }
 #movies a.list-group-item.success {color:#fff; background-color: #28a745; border-color: #fff;}
+#movies a.list-group-item small {text-align: right;}
 
 .btn.hidden {display: none;}
 .btn.width-100 {width: 100%;}
