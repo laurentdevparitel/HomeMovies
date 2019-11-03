@@ -61,3 +61,8 @@ https://zestedesavoir.com/tutoriels/312/debuter-avec-mongodb-pour-node-js/
 show dbs
 use {dbName}
 db.{collectionName}.find()
+
+
+## Open Movies API
+
+http://www.omdbapi.com/
