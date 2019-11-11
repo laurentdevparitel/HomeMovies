@@ -8,16 +8,27 @@ allocine.presets['reviewlist'] = {profile: 'large'};  // add reviewlist
 
 const APIUtils = require("./APIUtils.js");
 
-// TODO :
-//
-// - http://simov.github.io/express-admin/
-// - https://github.com/simov/express-admin
-//
-// - ajouter moteur tpl
-// https://webapplog.com/handlebars/
-// https://openclassrooms.com/courses/des-applications-ultra-rapides-avec-node-js/le-framework-express-js
+/*
+ TODO :
 
-// https://delicious-insights.com/fr/articles/libs-node-js/
+ - tester recherche film sur différentes API (imdb, AlloCine > KO : PhantomJS version)
+ > ajout select API engine app 
+
+ https://www.npmjs.com/package/allocine-crawler
+
+ https://github.com/fg2it/phantomjs-on-raspberry
+ https://github.com/ApioLab/phantomjs-2.1.1-linux-arm
+
+ - http://simov.github.io/express-admin/
+ - https://github.com/simov/express-admin
+
+ - ajouter moteur tpl
+ https://webapplog.com/handlebars/
+ https://openclassrooms.com/courses/des-applications-ultra-rapides-avec-node-js/le-framework-express-js
+
+ https://delicious-insights.com/fr/articles/libs-node-js/
+
+*/
 
 const HomeMoviesAPI = function () {
 

@@ -20,9 +20,6 @@ console.log("--- process.env [END]");
 const fs = require('fs');
 const path = require("path");
 
-// https://wiki.gromez.fr/dev/api/allocine_v3
-let allocine = require('allocine-api');
-allocine.presets['reviewlist'] = {profile: 'large'};  // add reviewlist
 
 /**
  * getClientURI
@@ -41,8 +38,10 @@ function getClientURI(){
 
 const CONFIG = {
     LINUX_ENV: typeof (process.env.SSH_CLIENT) !== "undefined" ? true: false,
-    VIDEO_DIR: typeof (process.env.SSH_CLIENT) !== "undefined" ? '/mnt/data/media/video/' : 'I:\GRABIT/',
-    VIDEO_DIR_PROTECTED: typeof (process.env.SSH_CLIENT) !== "undefined" ? '/mnt/data/media/video/' : 'I:GRABIT\\',
+    VIDEO_DIR: typeof (process.env.SSH_CLIENT) !== "undefined" ? '/home/shares/media/movies/' : 'I:\GRABIT/',
+    //VIDEO_DIR: typeof (process.env.SSH_CLIENT) !== "undefined" ? '/mnt/data/media/video/' : 'I:\GRABIT/',
+    VIDEO_DIR_PROTECTED: typeof (process.env.SSH_CLIENT) !== "undefined" ? '/home/shares/media/movies/' : 'I:GRABIT\\',
+    //VIDEO_DIR_PROTECTED: typeof (process.env.SSH_CLIENT) !== "undefined" ? '/mnt/data/media/video/' : 'I:GRABIT\\',
     VIDEO_OLD_DIR: '__OLD',
     CLIENT_URI: getClientURI(),
     //CLIENT_URI: typeof (process.env.SSH_CLIENT) !== "undefined" ? 'http://192.168.0.50:' + port + '/' : 'http://localhost:' + port + '/',
@@ -52,8 +51,44 @@ const CONFIG = {
     //EXPORTS_MOVIES_JSON_FILE: './exports/movies.json',
     PICTURES_DIR: 'pictures',
     RESIZED_PICTURES_DIR: 'pictures/resized',
-    MAX_RESIZED_PICTURES_WIDTH: 300
+    MAX_RESIZED_PICTURES_WIDTH: 300,
+    MOVIE_API: 'THEMOVIEDB'    // // API recherche utilisée : ALLOCINE, THEMOVIEDB, IMDB
 };
+
+let v3Client, allocine, imdb;
+
+switch (CONFIG.MOVIE_API) {
+
+    case 'THEMOVIEDB':
+
+        const { v3, v4 } = require('@leonardocabeza/the-movie-db');
+        const v3ApiKey = 'd3a8eb1865797e8962707f26bbdbbb88';
+        v3Client = v3(v3ApiKey);
+
+        //console.log("v3Client: ", v3Client);
+
+    break;
+
+    case 'ALLOCINE':
+
+        // https://wiki.gromez.fr/dev/api/allocine_v3
+        allocine = require('allocine-api');
+        allocine.presets['reviewlist'] = {profile: 'large'};  // add reviewlist
+
+        console.log("allocine: ", allocine);
+
+    break;
+
+    case 'IMDB':
+
+        imdb = require('imdb-api');
+        const API_KEY = "97cd5b44";
+
+        console.log("imdb: ", imdb);
+
+    break;
+} 
+
 const APIUtils = require('./APIUtils.js');
 const HomeMoviesAPI = require('./HomeMoviesAPI.js');
 HomeMoviesAPI.setPort(port);
@@ -121,19 +156,47 @@ try {
 
         let keywords = decodeURIComponent(req.params.movie);
 
-        allocine.api('search', {q: keywords, filter: 'movie'}, function (error, results) {
-            if (error) {
-                console.log('server [searchMovie] Error : ' + error);
-                return;
-            }
-            console.info('server [searchMovie]', keywords, results);
+        if (typeof(v3Client) !== "undefined"){
+            console.info('server [searchMovie] v3Client : ', v3Client);
 
-            // retour JSON
-            res.setHeader('Content-Type', 'application/json');
-            res.send(results);
-        });
+            v3Client.search.movies({
+                    query: keywords,
+                    language: 'fr'
+              })
+              .then((results) => {
 
-        //res.end('>>> END allocine');
+                    // retour JSON
+                    res.setHeader('Content-Type', 'application/json');
+                    res.send(results);
+              })
+              .catch((error) => {
+                    console.log('server [searchMovie] Error : ' + error);
+                    return;
+              });
+            
+        }
+        else if (typeof(allocine) !== "undefined"){
+            console.info('server [searchMovie] allocine : ', allocine);
+
+            allocine.api('search', {q: keywords, filter: 'movie'}, function (error, results) {
+                if (error) {
+                    console.log('server [searchMovie] Error : ' + error);
+                    return;
+                }
+                console.info('server [searchMovie]', keywords, results);
+
+                // retour JSON
+                res.setHeader('Content-Type', 'application/json');
+                res.send(results);
+            });
+            //res.end('>>> END allocine');
+        }
+        else if (typeof(imdb) !== "undefined"){
+            console.info('server [searchMovie] imdb : ', imdb);
+        } 
+        else {
+            throw new Error("no search movie API selected for :" + CONFIG.MOVIE_API)
+        }           
     });
 
     /**

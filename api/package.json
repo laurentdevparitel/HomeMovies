@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@leonardocabeza/the-movie-db": "^3.0.7",
     "allocine-api": "^0.1.9",
     "allocine-crawler": "^0.2.5",
     "async": "^2.6.3",
