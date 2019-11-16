@@ -147,7 +147,7 @@ try {
 
 
     /**
-     * AlloCine API : Recherche par mots-clés
+     * Movie API : Recherche par mots-clés
      *
      * TODO : sécuriser données entrantes
      * https://scotch.io/tutorials/use-expressjs-to-get-url-and-post-parameters

@@ -43,6 +43,11 @@ function APIClient() {
         serie: "par série",
         doc: "par documentaire"
     };
+
+    this.CONFIG = {
+        MOVIE_API: 'THEMOVIEDB',    // // API recherche utilisée : ALLOCINE, THEMOVIEDB, IMDB
+        POSTER_BASE_PATH: 'http://image.tmdb.org/t/p/w342/'
+    }
 };
 
 APIClient.prototype.getServerURL = function () {
@@ -142,8 +147,6 @@ APIClient.prototype.attachEvents = function () {
         var keywords = $("#movieKeywords").val();
         me.searchMovie(keywords);
     });
-
-
 
     $("#refreshMovies").on("click", function (e) {
         e.preventDefault();
@@ -407,28 +410,62 @@ APIClient.prototype.searchMovie = function (value) {
     });
 
     request.done(function (data) {  // success
-        console.log('APIClient [searchMovie] done', data);
-        if (!data.feed) {
-            if (data.movie) {    // recherche par id
+        console.log('APIClient [searchMovie] done', me.CONFIG.MOVIE_API, data);
 
-                // affichage complet du film trouvé
-                // TODO: ajouter synopsis + press reviews + genre
-                me.showMovies([data.movie]);
-            } else {
-                me.showMessage('No result for movie id #<b>' + value + '</b>', 3);
-            }
-        } else if (data.feed.totalResults === 0) {
-            me.showMessage('No result for movie: <b>' + value + '</b>', 3);
-        } else {    // recherche par mots-clés
+        switch (me.CONFIG.MOVIE_API) {
 
-            console.log('APIClient [searchMovie] total: ', data.feed.movie.length);
+            case "THEMOVIEDB":
 
-            // affiche nbre total de films trouvés
-            $("#totalMovieResults").text(data.feed.movie.length);
+                if (typeof(data.id) !== "undefined"){   // recherche par id
 
-            // affichage des films trouvés
-            me.showMovies(data.feed.movie);
-        }
+                    // affichage complet du film trouvé
+                    // TODO: ajouter synopsis + press reviews + genre
+                    me.showMovies(data);
+                }
+                else if (typeof(data.results) !== "undefined" && data.results.length){  // recherche par mots-clés
+                    console.log('APIClient [searchMovie] total: ', data.results.length);
+    
+                    // affiche nbre total de films trouvés
+                    $("#totalMovieResults").text(data.results.length);
+        
+                    // affichage des films trouvés
+                    me.showMovies(data.results);
+                }
+                else {
+                    me.showMessage('No result for movie: <b>' + value + '</b>', 3);
+                }
+            break;
+
+            case "ALLOCINE":
+
+                if (!data.feed) {
+                    if (data.movie) {    // recherche par id
+        
+                        // affichage complet du film trouvé
+                        // TODO: ajouter synopsis + press reviews + genre
+                        me.showMovies([data.movie]);
+                    } else {
+                        me.showMessage('No result for movie id #<b>' + value + '</b>', 3);
+                    }
+                } else if (data.feed.totalResults === 0) {
+                    me.showMessage('No result for movie: <b>' + value + '</b>', 3);
+                } else {    // recherche par mots-clés
+        
+                    console.log('APIClient [searchMovie] total: ', data.feed.movie.length);
+        
+                    // affiche nbre total de films trouvés
+                    $("#totalMovieResults").text(data.feed.movie.length);
+        
+                    // affichage des films trouvés
+                    me.showMovies(data.feed.movie);
+                }
+            break;
+
+            case "IMDB":
+                //
+            break;
+        } 
+        
     });
     request.fail(function (xhr, textStatus, errorThrown) { // error
         console.error('APIClient [searchMovie] fail', textStatus);
@@ -552,6 +589,70 @@ APIClient.prototype.getAPIMovie = function (movie, showSaveBtn) {
     var showSaveBtn = typeof (showSaveBtn) !== "undefined" ? showSaveBtn : true;
     var actionBtnClassName = showSaveBtn ? "" : "hidden";
 
+    switch(me.CONFIG.MOVIE_API){
+
+        case 'THEMOVIEDB':
+            return me.getTHEMOVIEDBMovieCard(movie, showSaveBtn, actionBtnClassName);
+        break;
+
+        case 'ALLOCINE':
+            return me.getALLOCINEMovieCard(movie, showSaveBtn, actionBtnClassName);
+        break;
+
+        case 'IMDB':
+            return null;
+        break;
+    }   
+};
+
+APIClient.prototype.getTHEMOVIEDBMovieCard = function(movie, showSaveBtn, actionBtnClassName){
+    var me = this;
+
+    var poster = typeof (movie.poster_path) !== "undefined" ? me.CONFIG.POSTER_BASE_PATH + movie.poster_path : "";
+    var link = "#";
+    var actors = "";
+    var directors = "";
+    var movieYear = movie.release_date.split("-")[0];
+
+    // if (poster.length){ // on affiche l'image traitée localement pour améliorer les perfs
+    //     var fileName = poster.split("/").pop();
+    //     poster = 'pictures/resized/'+fileName;
+    // }
+
+    var card = '<div class="card">\n\
+                    <img class="card-img-top" src="' + poster + '" alt="' + movie.original_title + '" onerror="this.onerror=null; this.src=\'./img/404.png\'; this.className=\'card-img-top img-404\';">\n\
+                    <div class="card-body">\n\
+                      <h4 class="card-title">' + movie.original_title + '</h4>\n\
+                      <p class="card-text">Year: ' + movieYear + '</p>\n\
+                    </div>';
+
+    card += '       <ul class="list-group list-group-flush">';
+
+    if (movie.overview && movie.genre_ids) {
+        card += '       <li class="list-group-item">' + movie.overview + '</li>\n\
+                        <li class="list-group-item">Duration: </li>\n\
+                        <li class="list-group-item">Genre(s): ' + me.getGenres(movie.genre_ids) + '</li>';
+    }
+    card += '           <li class="list-group-item">Actors: ' + actors + '</li>\n\
+                        <li class="list-group-item">Directors: ' + directors + '</li>\n\
+                    </ul>';
+
+    card += '       <div class="card-footer">\n\
+                        <small class="text-muted">Id: ' + movie.id + '</small>\n\
+                    </div>';
+
+    card += '      <div class="card-body text-center">\n\
+                      <a href="#" class="btn btn-primary btn-press" data-movie-code="' + movie.id + '"><i class="fa fa-align-left"></i> Press</a>\n\
+\n\                   <a href="#" class="btn btn-primary btn-save ' + actionBtnClassName + '" data-movie-code="' + movie.id + '"><i class="fa fa-check"></i> Save</a>\n\
+                    </div>\n\
+                  </div>';
+
+    return card;
+}
+
+APIClient.prototype.getALLOCINEMovieCard = function(movie, showSaveBtn, actionBtnClassName){
+    var me = this;
+
     var poster = typeof (movie.poster) !== "undefined" ? movie.poster.href : "";
     var link = typeof (movie.link[0]) !== "undefined" ? movie.link[0].href : "#";
     var actors = typeof (movie.castingShort) !== "undefined" ? movie.castingShort.actors : "";
@@ -592,9 +693,9 @@ APIClient.prototype.getAPIMovie = function (movie, showSaveBtn) {
                   </div>';
 
     return card;
-};
+}
 
-APIClient.prototype.getGenres = function (genres) {
+APIClient.prototype.getGenres = function (genres) { // TODO : à adapter en fonction de l'API ...
     var str = "";
     genres.forEach(function (item, index) {
         str += item.$;

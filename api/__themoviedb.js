@@ -75,18 +75,16 @@ base_url: 'http://image.tmdb.org/t/p/',
   });*/
 
  // search by keywords
- v3Client.search.movies({
-	//options: {
-  		query: 'Un Coeur En Hiver',	// 48150,  imdb_id: 'tt0105682'
-  		language: 'fr'
-	//}
-  })
-  .then((data) => {
-    console.log('-- keywords search results: ', data);
-  })
-  .catch((error) => {
-    console.log('error: ', error);
-  });
+//  v3Client.search.movies({
+//   		query: 'Un Coeur En Hiver',	// 48150,  imdb_id: 'tt0105682'
+//   		language: 'fr'
+//   })
+//   .then((data) => {
+//     console.log('-- keywords search results: ', data);
+//   })
+//   .catch((error) => {
+//     console.log('error: ', error);
+//   });
 
   // search by id
  v3Client.movie.details(48150, {language: 'fr'})	//  453405,  118043
